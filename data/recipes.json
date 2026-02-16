@@ -1,0 +1,35 @@
+[
+  {
+    "id": 1771107839567,
+    "name": "Paella mixta",
+    "category": "Principal",
+    "time": 50,
+    "ingredients": [
+      {
+        "name": "Arroz",
+        "amount": "500 g"
+      },
+      {
+        "name": "Caldo",
+        "amount": "1.2 L"
+      }
+    ],
+    "preparation": "Cocinar mas"
+  },
+  {
+    "id": 1771107684115,
+    "name": "primera",
+    "category": "Entrante",
+    "time": 50,
+    "ingredients": "erwer",
+    "preparation": "werwr"
+  },
+  {
+    "id": 1771107488246,
+    "name": "B",
+    "category": "Postre",
+    "time": 25,
+    "ingredients": "i2",
+    "preparation": "p2"
+  }
+]

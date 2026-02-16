@@ -55,6 +55,13 @@ h3 {
   gap: 14px;
 }
 
+.auth-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 14px 0;
+}
+
 label {
   display: grid;
   gap: 6px;
@@ -106,6 +113,16 @@ button:hover {
 
 .secondary:hover {
   background: #d9e3ec;
+}
+
+.ghost {
+  background: #eef3f8;
+  color: #33465f;
+}
+
+.ghost.active {
+  background: var(--brand);
+  color: #ffffff;
 }
 
 .danger {
@@ -161,6 +178,42 @@ button:hover {
   gap: 12px;
 }
 
+.recipe-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.recipe-actions button {
+  width: auto;
+}
+
+.recipe-edit-form {
+  display: grid;
+  gap: 10px;
+}
+
+.ingredients-block {
+  display: grid;
+  gap: 8px;
+}
+
+.ingredients-block span {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.ingredient-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 8px;
+}
+
+.ingredients-list {
+  margin: 6px 0 0;
+  padding-left: 18px;
+}
+
 .recipe-item p {
   margin: 8px 0 0;
   line-height: 1.4;
@@ -175,6 +228,10 @@ button:hover {
   .recipe-top {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .ingredient-row {
+    grid-template-columns: 1fr;
   }
 
   .card {

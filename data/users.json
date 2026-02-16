@@ -1,0 +1,27 @@
+[
+  {
+    "id": 1771107291973,
+    "username": "admin",
+    "passwordHash": "$2b$10$xvFQezxd6ZJG7UphhmvJf.JuUv8Kd/wKvcT2CSfnGHw3vwl9sn7TG"
+  },
+  {
+    "id": 1771107391048,
+    "username": "user1771107389",
+    "passwordHash": "$2b$10$QgwGUieYfHLnmi.kf98qFuiG/BJcZyHcxpFeEcr/wnsu3ayhhe4si"
+  },
+  {
+    "id": 1771107488234,
+    "username": "edit1771107487",
+    "passwordHash": "$2b$10$BhC9gvv5jIsnnC1MuzNUt.uWfK6jM93SmLKAG3LBnklnII2mcnGz6"
+  },
+  {
+    "id": 1771107839550,
+    "username": "ing1771107838",
+    "passwordHash": "$2b$10$.cEcaybapMk6o/ZMe06Bd.wpQkikv6w14HVxWRc.D8fi6i3o4xQai"
+  },
+  {
+    "id": 1771108194506,
+    "username": "pedro",
+    "passwordHash": "$2b$10$Bq4KGZUl0p3ubvPPiM00cuaCAPc8LuMzUlN1pSXV7yFA9rG9E3vim"
+  }
+]
