@@ -1,0 +1,183 @@
+:root {
+  --bg: #f3f6f9;
+  --card: #ffffff;
+  --line: #d8e0e8;
+  --text: #18212f;
+  --muted: #5e6b7b;
+  --brand: #0f766e;
+  --brand-dark: #0b5f59;
+  --danger: #b42318;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  background: linear-gradient(140deg, #f6f9fc, #ebf2f7);
+  color: var(--text);
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.card {
+  width: min(860px, 100%);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 10px 35px rgba(23, 38, 61, 0.08);
+}
+
+.auth-card {
+  width: min(420px, 100%);
+}
+
+h1,
+h2,
+h3 {
+  margin-top: 0;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.stack {
+  display: grid;
+  gap: 14px;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+input,
+textarea,
+select,
+button {
+  font: inherit;
+}
+
+input,
+textarea,
+select {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: var(--text);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 2px solid #8ed7d1;
+  border-color: var(--brand);
+}
+
+button {
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 700;
+  cursor: pointer;
+  background: var(--brand);
+  color: #ffffff;
+}
+
+button:hover {
+  background: var(--brand-dark);
+}
+
+.secondary {
+  background: #e6edf4;
+  color: #2c3d52;
+}
+
+.secondary:hover {
+  background: #d9e3ec;
+}
+
+.danger {
+  background: #f9d8d4;
+  color: var(--danger);
+}
+
+.danger:hover {
+  background: #f2c8c3;
+}
+
+.error {
+  margin-top: 12px;
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.hint {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.recipe-form {
+  display: grid;
+  gap: 14px;
+}
+
+.recipes {
+  margin-top: 26px;
+}
+
+.recipe-item {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px;
+  margin-top: 12px;
+  background: #fafcfe;
+}
+
+.recipe-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.recipe-item p {
+  margin: 8px 0 0;
+  line-height: 1.4;
+}
+
+.empty {
+  margin-top: 20px;
+}
+
+@media (max-width: 680px) {
+  .panel-header,
+  .recipe-top {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .card {
+    padding: 18px;
+  }
+}
