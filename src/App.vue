@@ -7,7 +7,7 @@
         demo-user="admin"
         demo-password="1234"
         @set-mode="setAuthMode"
-        @submit="submitAuth"
+        @submit="submitAuth"∫
       />
     </section>
 
@@ -15,7 +15,7 @@
       <header class="panel-header">
         <div>
           <h1>Alta de recetas</h1>
-          <p class="muted">Bienvenido, {{ currentUser }}</p>
+          <p class="muted">Bienvenido 2, {{ currentUser }}</p>
         </div>
         <button class="secondary" @click="logout">Cerrar sesion</button>
       </header>
