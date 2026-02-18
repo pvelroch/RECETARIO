@@ -14,107 +14,51 @@
     <section v-else class="card panel-card">
       <header class="panel-header">
         <div>
-          <h1>Alta de recetas</h1>
-          <p class="muted">Bienvenido 2, {{ currentUser }}</p>
+          <h1 v-if="currentView === 'search'">🔍 Busca tus recetas favoritas</h1>
+          <h1 v-else>📖 Detalle de la receta</h1>
+          <p class="muted">Bienvenido, {{ currentUser }}</p>
         </div>
-        <button class="secondary" @click="logout">Cerrar sesion</button>
+        <div>
+          <button v-if="currentView === 'detail'" class="secondary" @click="goToSearch">⬅️ Volver</button>
+          <button class="secondary" @click="logout">🚪 Cerrar sesión</button>
+        </div>
       </header>
 
-      <RecipeForm :error="formError" @submit="addRecipe" />
-      <p v-if="apiError" class="error">{{ apiError }}</p>
-
-      <section class="recipes" v-if="recipes.length">
-        <h2>Recetas guardadas</h2>
-        <article class="recipe-item" v-for="recipe in recipes" :key="recipe.id">
-          <template v-if="editingRecipeId === recipe.id">
-            <div class="recipe-edit-form">
-              <label>
-                Nombre de la receta
-                <input v-model.trim="editForm.name" type="text" maxlength="80" />
-              </label>
-
-              <label>
-                Categoria
-                <select v-model="editForm.category">
-                  <option disabled value="">Selecciona una categoria</option>
-                  <option>Entrante</option>
-                  <option>Principal</option>
-                  <option>Postre</option>
-                  <option>Bebida</option>
-                </select>
-              </label>
-
-              <label>
-                Tiempo (minutos)
-                <input v-model.number="editForm.time" type="number" min="1" max="600" />
-              </label>
-
-              <div class="ingredients-block">
-                <span>Ingredientes</span>
-                <div
-                  class="ingredient-row"
-                  v-for="(ingredient, index) in editForm.ingredients"
-                  :key="`edit-${recipe.id}-${index}`"
-                >
-                  <input v-model.trim="ingredient.name" type="text" placeholder="Ingrediente" />
-                  <input
-                    v-model.trim="ingredient.amount"
-                    type="text"
-                    placeholder="Cantidad (ej. 200 g)"
-                  />
-                  <button
-                    type="button"
-                    class="danger"
-                    @click="removeEditIngredient(index)"
-                    :disabled="editForm.ingredients.length === 1"
-                  >
-                    Quitar
-                  </button>
-                </div>
-                <button type="button" class="secondary" @click="addEditIngredient">
-                  Agregar ingrediente
-                </button>
-              </div>
-
-              <label>
-                Preparacion
-                <textarea v-model.trim="editForm.preparation" rows="5"></textarea>
-              </label>
-            </div>
-
-            <div class="recipe-actions">
-              <button @click="saveRecipe(recipe.id)">Guardar</button>
-              <button class="secondary" @click="cancelEdit">Cancelar</button>
-              <button class="danger" @click="removeRecipe(recipe.id)">Eliminar</button>
-            </div>
-          </template>
-
-          <template v-else>
-            <div class="recipe-top">
+      <div v-if="currentView === 'search'">
+        <div class="search-section">
+          <label>
+            🥕 Ingredientes (separados por coma)
+            <input v-model="searchQuery" type="text" placeholder="ej. pollo, cebolla, tomate" />
+          </label>
+          <button @click="searchRecipes">🔍 Buscar</button>
+        </div>
+        <section class="recipes" v-if="filteredRecipes.length">
+          <h2>🍽️ Resultados</h2>
+          <article class="recipe-item" v-for="recipe in filteredRecipes" :key="recipe.id" @click="viewRecipe(recipe)">
+            <div class="recipe-summary">
               <h3>{{ recipe.name }}</h3>
-              <div class="recipe-actions">
-                <button class="secondary" @click="startEdit(recipe)">Editar</button>
-                <button class="danger" @click="removeRecipe(recipe.id)">Eliminar</button>
-              </div>
+              <p><strong>Categoría:</strong> {{ recipe.category }}</p>
+              <p><strong>Tiempo:</strong> {{ recipe.time }} min</p>
+              <p><strong>Ingredientes:</strong> {{ recipe.ingredients.map(i => i.name).join(', ') }}</p>
             </div>
-            <p>
-              <strong>Categoria:</strong> {{ recipe.category }} |
-              <strong>Tiempo:</strong> {{ recipe.time }} min
-            </p>
-            <div>
-              <strong>Ingredientes:</strong>
-              <ul class="ingredients-list">
-                <li v-for="(ingredient, index) in recipe.ingredients" :key="`show-${recipe.id}-${index}`">
-                  {{ ingredient.name }} - {{ ingredient.amount }}
-                </li>
-              </ul>
-            </div>
-            <p><strong>Preparacion:</strong> {{ recipe.preparation }}</p>
-          </template>
-        </article>
-      </section>
+          </article>
+        </section>
+        <p v-else class="empty">No se encontraron recetas. ¡Crea una nueva!</p>
+      </div>
 
-      <p v-else class="muted empty">Aun no hay recetas registradas.</p>
+      <div v-else-if="currentView === 'detail' && selectedRecipe">
+        <div class="recipe-detail">
+          <h2>{{ selectedRecipe.name }}</h2>
+          <p><strong>📂 Categoría:</strong> {{ selectedRecipe.category }}</p>
+          <p><strong>⏱️ Tiempo:</strong> {{ selectedRecipe.time }} minutos</p>
+          <h3>🥕 Ingredientes</h3>
+          <ul>
+            <li v-for="ing in selectedRecipe.ingredients" :key="ing.name">{{ ing.amount }} {{ ing.name }}</li>
+          </ul>
+          <h3>📝 Preparación</h3>
+          <p>{{ selectedRecipe.preparation }}</p>
+        </div>
+      </div>
     </section>
   </main>
 </template>
@@ -147,15 +91,13 @@ export default {
       formError: "",
       apiError: "",
       recipes: [],
-      editingRecipeId: null,
-      editForm: {
-        name: "",
-        category: "",
-        time: null,
-        ingredients: [{ name: "", amount: "" }],
-        preparation: "",
-      },
+      currentView: 'search',
+      selectedRecipe: null,
+      searchQuery: '',
+      filteredRecipes: [],
     };
+  },
+  computed: {
   },
   created() {
     this.restoreSession();
@@ -200,6 +142,7 @@ export default {
           ...recipe,
           ingredients: this.normalizeIngredients(recipe.ingredients),
         }));
+        this.filteredRecipes = this.recipes;
       } catch (_error) {
         this.apiError = "No se pudieron cargar las recetas del servidor";
       }
@@ -271,6 +214,8 @@ export default {
         this.isAuthenticated = true;
         this.currentUser = data.username;
         await this.fetchRecipes();
+        this.currentView = 'search';
+        this.filteredRecipes = this.recipes;
       } catch (_error) {
         this.authError = "No se pudo iniciar sesion";
       }
@@ -419,6 +364,24 @@ export default {
       } catch (_error) {
         this.apiError = "No se pudo eliminar la receta";
       }
+    },
+    goToSearch() {
+      this.currentView = 'search';
+      this.selectedRecipe = null;
+    },
+    viewRecipe(recipe) {
+      this.selectedRecipe = recipe;
+      this.currentView = 'detail';
+    },
+    searchRecipes() {
+      if (!this.searchQuery.trim()) {
+        this.filteredRecipes = this.recipes;
+        return;
+      }
+      const queryIngredients = this.searchQuery.split(',').map(i => i.trim().toLowerCase()).filter(Boolean);
+      this.filteredRecipes = this.recipes.filter(recipe =>
+        queryIngredients.some(q => recipe.ingredients.some(ing => ing.name.toLowerCase().includes(q)))
+      );
     },
   },
 };

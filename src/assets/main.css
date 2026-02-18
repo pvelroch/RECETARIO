@@ -1,12 +1,14 @@
 :root {
-  --bg: #f3f6f9;
+  --bg: #fef7ed;
   --card: #ffffff;
-  --line: #d8e0e8;
-  --text: #18212f;
-  --muted: #5e6b7b;
-  --brand: #0f766e;
-  --brand-dark: #0b5f59;
-  --danger: #b42318;
+  --line: #f3e8d8;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --brand: #ea580c;
+  --brand-dark: #c2410c;
+  --danger: #dc2626;
+  --success: #16a34a;
+  --warning: #d97706;
 }
 
 * {
@@ -15,8 +17,8 @@
 
 body {
   margin: 0;
-  font-family: "Segoe UI", Tahoma, sans-serif;
-  background: linear-gradient(140deg, #f6f9fc, #ebf2f7);
+  font-family: 'Nunito', 'Segoe UI', Tahoma, sans-serif;
+  background: linear-gradient(140deg, #fef7ed, #fed7aa);
   color: var(--text);
 }
 
@@ -31,9 +33,9 @@ body {
   width: min(860px, 100%);
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 10px 35px rgba(23, 38, 61, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .auth-card {
@@ -79,45 +81,55 @@ button {
 input,
 textarea,
 select {
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 10px 12px;
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  padding: 12px 14px;
   color: var(--text);
+  transition: border-color 0.2s ease;
 }
 
 input:focus,
 textarea:focus,
 select:focus {
-  outline: 2px solid #8ed7d1;
+  outline: none;
   border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.1);
 }
 
 button {
   border: 0;
-  border-radius: 10px;
-  padding: 10px 14px;
+  border-radius: 12px;
+  padding: 12px 16px;
   font-weight: 700;
   cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   background: var(--brand);
   color: #ffffff;
 }
 
 button:hover {
   background: var(--brand-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .secondary {
-  background: #e6edf4;
-  color: #2c3d52;
+  background: #f3f4f6;
+  color: #374151;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .secondary:hover {
-  background: #d9e3ec;
+  background: #e5e7eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .ghost {
-  background: #eef3f8;
-  color: #33465f;
+  background: #fef3c7;
+  color: #92400e;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .ghost.active {
@@ -125,13 +137,22 @@ button:hover {
   color: #ffffff;
 }
 
+.ghost:hover {
+  background: #fde68a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
 .danger {
-  background: #f9d8d4;
+  background: #fef2f2;
   color: var(--danger);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .danger:hover {
-  background: #f2c8c3;
+  background: #fee2e2;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .error {
@@ -219,8 +240,32 @@ button:hover {
   line-height: 1.4;
 }
 
-.empty {
-  margin-top: 20px;
+.search-section {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.recipe-summary {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.recipe-summary:hover {
+  transform: translateY(-2px);
+}
+
+.recipe-detail {
+  display: grid;
+  gap: 16px;
+}
+
+.recipe-detail h2 {
+  margin-top: 0;
+}
+
+.recipe-detail ul {
+  padding-left: 20px;
 }
 
 @media (max-width: 680px) {

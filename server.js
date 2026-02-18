@@ -27,6 +27,8 @@ app.use(
     origin(origin, callback) {
       if (!origin) return callback(null, true);
       if (CLIENT_ORIGINS.includes(origin)) return callback(null, true);
+      // Allow localhost origins in development
+      if (!IS_PROD && origin.match(/^https?:\/\/localhost(:\d+)?$/)) return callback(null, true);
       return callback(new Error("Origen no permitido por CORS"));
     },
     credentials: true,

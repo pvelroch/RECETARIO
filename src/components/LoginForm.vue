@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>{{ mode === "login" ? "Iniciar sesion" : "Crear cuenta" }}</h1>
+    <h1>{{ mode === "login" ? "🔑 Iniciar sesión" : "👤 Crear cuenta" }}</h1>
     <p class="muted">
       {{ mode === "login" ? "Accede para gestionar recetas" : "Registra un usuario nuevo" }}
     </p>
@@ -12,7 +12,7 @@
         :class="{ active: mode === 'login' }"
         @click="$emit('set-mode', 'login')"
       >
-        Entrar
+        🔑 Entrar
       </button>
       <button
         type="button"
@@ -20,18 +20,18 @@
         :class="{ active: mode === 'register' }"
         @click="$emit('set-mode', 'register')"
       >
-        Crear cuenta
+        👤 Crear cuenta
       </button>
     </div>
 
     <form @submit.prevent="submit" class="stack">
       <label>
-        Usuario
+        👤 Usuario
         <input v-model.trim="username" type="text" required minlength="3" autocomplete="username" />
       </label>
 
       <label>
-        Contrasena
+        🔒 Contraseña
         <input
           v-model="password"
           type="password"
@@ -42,7 +42,7 @@
       </label>
 
       <label v-if="mode === 'register'">
-        Confirmar contrasena
+        🔒 Confirmar contraseña
         <input
           v-model="confirmPassword"
           type="password"
@@ -52,7 +52,7 @@
         />
       </label>
 
-      <button type="submit">{{ mode === "login" ? "Entrar" : "Crear usuario" }}</button>
+      <button type="submit">{{ mode === "login" ? "🚀 Entrar" : "✅ Crear usuario" }}</button>
     </form>
 
     <p v-if="error" class="error">{{ error }}</p>
