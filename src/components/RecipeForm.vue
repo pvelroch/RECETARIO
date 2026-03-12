@@ -2,14 +2,14 @@
   <div>
     <form @submit.prevent="submit" class="recipe-form">
       <label>
-        Nombre de la receta
+        🍽️ Nombre de la receta
         <input v-model.trim="form.name" type="text" required maxlength="80" />
       </label>
 
       <label>
-        Categoria
+        📂 Categoría
         <select v-model="form.category" required>
-          <option disabled value="">Selecciona una categoria</option>
+          <option disabled value="">Selecciona una categoría</option>
           <option>Entrante</option>
           <option>Principal</option>
           <option>Postre</option>
@@ -18,12 +18,12 @@
       </label>
 
       <label>
-        Tiempo (minutos)
+        ⏱️ Tiempo (minutos)
         <input v-model.number="form.time" type="number" min="1" max="600" required />
       </label>
 
       <div class="ingredients-block">
-        <span>Ingredientes</span>
+        <span>🥕 Ingredientes</span>
         <div class="ingredient-row" v-for="(ingredient, index) in form.ingredients" :key="index">
           <input
             v-model.trim="ingredient.name"
@@ -43,14 +43,14 @@
             @click="removeIngredient(index)"
             :disabled="form.ingredients.length === 1"
           >
-            Quitar
+            ➖ Quitar
           </button>
         </div>
-        <button type="button" class="secondary" @click="addIngredient">Agregar ingrediente</button>
+        <button type="button" class="secondary" @click="addIngredient">➕ Agregar ingrediente</button>
       </div>
 
       <label>
-        Preparacion
+        📝 Preparación
         <textarea
           v-model.trim="form.preparation"
           rows="5"
@@ -59,7 +59,7 @@
         ></textarea>
       </label>
 
-      <button type="submit">Guardar receta</button>
+      <button type="submit">💾 Guardar receta</button>
     </form>
 
     <p v-if="error" class="error">{{ error }}</p>

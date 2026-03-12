@@ -168,9 +168,16 @@ button:active {
   color: #ffffff;
 }
 
+.ghost:hover {
+  background: #fde68a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
 .danger {
   background: #fde1dc;
   color: var(--danger);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .danger:hover {
