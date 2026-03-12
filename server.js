@@ -13,20 +13,21 @@ const IS_PROD = process.env.NODE_ENV === "production";
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, "data");
 const RECIPES_FILE = path.join(DATA_DIR, "recipes.json");
 const USERS_FILE = path.join(DATA_DIR, "users.json");
-
 const SESSION_COOKIE_NAME = "sid";
 const SESSION_TTL_MS = 24 * 60 * 60 * 1000;
-const sessions = new Map();
 const CLIENT_ORIGINS = String(process.env.CLIENT_ORIGIN || "")
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);
+const sessions = new Map();
 
 app.use(
   cors({
     origin(origin, callback) {
       if (!origin) return callback(null, true);
-      if (CLIENT_ORIGINS.includes(origin)) return callback(null, true);
+      if (!CLIENT_ORIGINS.length || CLIENT_ORIGINS.includes(origin)) {
+        return callback(null, true);
+      }
       return callback(new Error("Origen no permitido por CORS"));
     },
     credentials: true,
@@ -67,34 +68,6 @@ async function writeUsers(users) {
   return writeArrayFile(USERS_FILE, users);
 }
 
-async function ensureDefaultAdminUser() {
-  const users = await readUsers();
-  const hasAdmin = users.some((user) => user.username === "admin");
-  if (hasAdmin) return;
-
-  const passwordHash = await bcrypt.hash("1234", 10);
-  users.push({
-    id: Date.now(),
-    username: "admin",
-    passwordHash,
-  });
-
-  await writeUsers(users);
-}
-
-function createSession(username) {
-  const sid = crypto.randomBytes(32).toString("hex");
-  sessions.set(sid, {
-    username,
-    expiresAt: Date.now() + SESSION_TTL_MS,
-  });
-  return sid;
-}
-
-function normalizeUsername(value) {
-  return String(value || "").trim();
-}
-
 function normalizeIngredients(input) {
   if (!Array.isArray(input)) return [];
   return input
@@ -128,9 +101,25 @@ function sanitizeRecipeInput(input) {
   return isValid ? recipe : null;
 }
 
+function normalizeUsername(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function createSession(username) {
+  const sid = crypto.randomBytes(24).toString("hex");
+  sessions.set(sid, {
+    username,
+    expiresAt: Date.now() + SESSION_TTL_MS,
+  });
+  return sid;
+}
+
 function clearSession(res, sid) {
   if (sid) sessions.delete(sid);
-  res.clearCookie(SESSION_COOKIE_NAME);
+  res.clearCookie(SESSION_COOKIE_NAME, {
+    sameSite: IS_PROD ? "none" : "lax",
+    secure: IS_PROD,
+  });
 }
 
 function getValidSession(req, res) {
@@ -157,9 +146,17 @@ function requireAuth(req, res, next) {
     return res.status(401).json({ message: "No autenticado" });
   }
 
-  req.sessionId = valid.sid;
   req.user = { username: valid.session.username };
   next();
+}
+
+function setSessionCookie(res, sid) {
+  res.cookie(SESSION_COOKIE_NAME, sid, {
+    httpOnly: true,
+    sameSite: IS_PROD ? "none" : "lax",
+    maxAge: SESSION_TTL_MS,
+    secure: IS_PROD,
+  });
 }
 
 app.get("/api/session", (req, res) => {
@@ -169,6 +166,36 @@ app.get("/api/session", (req, res) => {
   }
 
   res.json({ username: valid.session.username });
+});
+
+app.post("/api/register", async (req, res) => {
+  try {
+    const username = normalizeUsername(req.body.username);
+    const password = String(req.body.password || "");
+
+    if (username.length < 3 || password.length < 4) {
+      return res.status(400).json({ message: "Usuario o contrasena no validos" });
+    }
+
+    const users = await readUsers();
+    if (users.some((user) => user.username === username)) {
+      return res.status(409).json({ message: "El usuario ya existe" });
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
+    users.push({
+      id: Date.now(),
+      username,
+      passwordHash,
+    });
+    await writeUsers(users);
+
+    const sid = createSession(username);
+    setSessionCookie(res, sid);
+    res.status(201).json({ username });
+  } catch (_error) {
+    res.status(500).json({ message: "No se pudo crear el usuario" });
+  }
 });
 
 app.post("/api/login", async (req, res) => {
@@ -182,7 +209,6 @@ app.post("/api/login", async (req, res) => {
 
     const users = await readUsers();
     const user = users.find((candidate) => candidate.username === username);
-
     if (!user) {
       return res.status(401).json({ message: "Credenciales incorrectas" });
     }
@@ -192,67 +218,26 @@ app.post("/api/login", async (req, res) => {
       return res.status(401).json({ message: "Credenciales incorrectas" });
     }
 
-    const sid = createSession(user.username);
-    res.cookie(SESSION_COOKIE_NAME, sid, {
-      httpOnly: true,
-      sameSite: IS_PROD ? "none" : "lax",
-      maxAge: SESSION_TTL_MS,
-      secure: IS_PROD,
-    });
-
-    res.json({ username: user.username });
-  } catch (_error) {
-    res.status(500).json({ message: "Error al iniciar sesion" });
-  }
-});
-
-app.post("/api/register", async (req, res) => {
-  try {
-    const username = normalizeUsername(req.body.username);
-    const password = String(req.body.password || "");
-
-    if (username.length < 3 || password.length < 4) {
-      return res.status(400).json({ message: "Usuario o contrasena no validos" });
-    }
-
-    const users = await readUsers();
-    const exists = users.some((candidate) => candidate.username === username);
-    if (exists) {
-      return res.status(409).json({ message: "El usuario ya existe" });
-    }
-
-    const passwordHash = await bcrypt.hash(password, 10);
-    users.push({
-      id: Date.now(),
-      username,
-      passwordHash,
-    });
-    await writeUsers(users);
-
     const sid = createSession(username);
-    res.cookie(SESSION_COOKIE_NAME, sid, {
-      httpOnly: true,
-      sameSite: IS_PROD ? "none" : "lax",
-      maxAge: SESSION_TTL_MS,
-      secure: IS_PROD,
-    });
-
-    res.status(201).json({ username });
+    setSessionCookie(res, sid);
+    res.json({ username });
   } catch (_error) {
-    res.status(500).json({ message: "Error al registrar usuario" });
+    res.status(500).json({ message: "No se pudo iniciar sesion" });
   }
 });
 
 app.post("/api/logout", (req, res) => {
-  const sid = req.cookies[SESSION_COOKIE_NAME];
-  clearSession(res, sid);
+  clearSession(res, req.cookies[SESSION_COOKIE_NAME]);
   res.status(204).send();
 });
 
-app.get("/api/recipes", requireAuth, async (_req, res) => {
+app.get("/api/recipes", requireAuth, async (req, res) => {
   try {
     const recipes = await readRecipes();
-    res.json(recipes);
+    const visibleRecipes = recipes.filter(
+      (recipe) => !recipe.ownerUsername || recipe.ownerUsername === req.user.username,
+    );
+    res.json(visibleRecipes);
   } catch (_error) {
     res.status(500).json({ message: "No se pudieron cargar las recetas" });
   }
@@ -268,6 +253,7 @@ app.post("/api/recipes", requireAuth, async (req, res) => {
     const recipes = await readRecipes();
     const recipe = {
       id: Date.now(),
+      ownerUsername: req.user.username,
       ...recipeInput,
     };
 
@@ -294,9 +280,15 @@ app.put("/api/recipes/:id", requireAuth, async (req, res) => {
       return res.status(404).json({ message: "Receta no encontrada" });
     }
 
+    const recipe = recipes[recipeIndex];
+    if (recipe.ownerUsername && recipe.ownerUsername !== req.user.username) {
+      return res.status(403).json({ message: "No puedes editar esta receta" });
+    }
+
     const updatedRecipe = {
-      ...recipes[recipeIndex],
+      ...recipe,
       ...recipeInput,
+      ownerUsername: recipe.ownerUsername || req.user.username,
     };
 
     recipes[recipeIndex] = updatedRecipe;
@@ -312,12 +304,17 @@ app.delete("/api/recipes/:id", requireAuth, async (req, res) => {
   try {
     const id = Number(req.params.id);
     const recipes = await readRecipes();
-    const nextRecipes = recipes.filter((recipe) => recipe.id !== id);
+    const recipe = recipes.find((item) => item.id === id);
 
-    if (nextRecipes.length === recipes.length) {
+    if (!recipe) {
       return res.status(404).json({ message: "Receta no encontrada" });
     }
 
+    if (recipe.ownerUsername && recipe.ownerUsername !== req.user.username) {
+      return res.status(403).json({ message: "No puedes eliminar esta receta" });
+    }
+
+    const nextRecipes = recipes.filter((item) => item.id !== id);
     await writeRecipes(nextRecipes);
     res.status(204).send();
   } catch (_error) {
@@ -327,7 +324,6 @@ app.delete("/api/recipes/:id", requireAuth, async (req, res) => {
 
 async function bootstrap() {
   await fs.mkdir(DATA_DIR, { recursive: true });
-  await ensureDefaultAdminUser();
 
   app.listen(PORT, () => {
     console.log(`API recetas disponible en http://localhost:${PORT}`);

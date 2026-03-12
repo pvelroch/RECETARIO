@@ -101,18 +101,6 @@ export default {
     },
     submit() {
       this.$emit("submit", { ...this.form });
-      this.form = {
-        name: "",
-        category: "",
-        time: null,
-        ingredients: [
-          {
-            name: "",
-            amount: "",
-          },
-        ],
-        preparation: "",
-      };
     },
   },
 };

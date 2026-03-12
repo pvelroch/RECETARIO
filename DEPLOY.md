@@ -28,5 +28,4 @@
 
 ## Notas
 
-- El login usa cookie de sesion (`HttpOnly`) y CORS con credenciales.
-- En produccion la cookie usa `Secure` + `SameSite=None`.
+- La API queda abierta (sin login) y CORS se controla con `CLIENT_ORIGIN`.
